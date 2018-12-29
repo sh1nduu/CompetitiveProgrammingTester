@@ -1,8 +1,10 @@
+#!/usr/bin/env ruby
+
 require 'yaml'
 require 'optparse'
-require './source/io_writer'
-require './source/language_map'
-require './source/test_case'
+require_relative './source/io_writer'
+require_relative './source/language_map'
+require_relative './source/test_case'
 
 module Main extend self
   def run

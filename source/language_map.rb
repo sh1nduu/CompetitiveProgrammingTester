@@ -8,11 +8,11 @@ module LanguageMap extend self
 
   class Cpp14 < Language
     def compile
-      "g++ #{@filename} -o ./bin/#{@basename} -std=c++14"
+      "g++ #{@filename} -o ./#{@basename} -std=c++14"
     end
 
     def execute
-      "./bin/#{@basename}"
+      "./#{@basename}"
     end
   end
 
