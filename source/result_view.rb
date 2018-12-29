@@ -14,12 +14,12 @@ class ResultView
     if @succeeded_all
       w("Congratulation! All cases succeeded! 🎉\n", :success, 1)
     else
-      w("Failed: #{failure_numbers.join(", ")}\n", :alert, 1) unless @failure_cases.size.zero?
+      w("Failed: #{failure_numbers.join(", ")}\n", :alert, 1)
     end
   end
 
   private
   def failure_numbers
-    @failure_cases.map{|t| t.id}
+    @failure_cases.map(&:id)
   end
 end
