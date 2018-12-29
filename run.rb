@@ -12,8 +12,8 @@ module Main extend self
     yaml = load_yaml(params["t"])
 
     language = LanguageMap::get(params["l"], params["s"])
-
     raise "language is unsupported. verify -l" unless language
+
     return unless system(language.compile)
 
     yaml["testcase"].each.with_index(1) do |testcase, i|

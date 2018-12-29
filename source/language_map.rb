@@ -1,5 +1,4 @@
 module LanguageMap extend self
-
   class Language
     def initialize(filename)
       @filename = filename
