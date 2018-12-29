@@ -3,11 +3,13 @@ module IOWriter extend self
   FG_GREEN_SQ = "\e[32m"
   FG_WHITE_SQ = "\e[37m"
   END_SQ = "\e[0m"
+  INDENT = "  "
 
-  def write(message, style = nil)
+  def write(message, style=nil, nest=0)
     color_sq = get_color_sq(style)
-    print "#{color_sq}#{message}#{END_SQ}"
+    print "#{INDENT*nest}#{color_sq}#{message}#{END_SQ}"
   end
+  alias w write
 
   private
 

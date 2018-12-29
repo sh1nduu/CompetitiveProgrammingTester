@@ -1,4 +1,5 @@
 class TestCase
+  attr_reader :id, :input, :expect, :output
   def initialize(id, data, lang)
     @id = id
     @input = data["input"]
@@ -15,15 +16,12 @@ class TestCase
     end
   end
 
-  def draw_result
-    IOWriter.write("CASE #{@id}: ")
-    if @result
-      IOWriter.write("SUCCESS\n", :success)
-    else
-      IOWriter.write("FAILED\n", :alert)
-      IOWriter.write("\tExpected: #{@expect}\n", :alert)
-      IOWriter.write("\tBut got: #{@output}\n", :alert)
-    end
+  def success?
+    @result
+  end
+
+  def failure?
+    !success?
   end
 end
 

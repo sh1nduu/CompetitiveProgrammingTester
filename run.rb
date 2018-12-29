@@ -4,7 +4,9 @@ require 'yaml'
 require 'optparse'
 require_relative './source/io_writer'
 require_relative './source/language_map'
+require_relative './source/result_view'
 require_relative './source/test_case'
+require_relative './source/test_case_view'
 
 module Main extend self
   def run
@@ -18,11 +20,14 @@ module Main extend self
 
     return unless system(language.compile)
 
-    yaml["testcase"].each.with_index(1) do |testcase, i|
+    testcases = yaml["testcase"].map.with_index(1) do |testcase, i|
       tc = TestCase.new(i, testcase, language)
       tc.execute
-      tc.draw_result
+      TestCaseView.new(tc).draw
+      tc
     end
+
+    ResultView.new(testcases).draw
   end
 
   private
