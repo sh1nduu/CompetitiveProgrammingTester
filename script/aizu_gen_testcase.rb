@@ -8,6 +8,16 @@ require 'uri'
 
 INTERVAL = 2 # crawling interval seconds
 
+CPP_DEFAULT = <<-EOF
+#include <iostream>
+using namespace std;
+
+int main() {
+  // Write your code here.
+  return 0;
+}
+EOF
+
 class TestCase
   attr_reader :data
 
@@ -64,27 +74,30 @@ class TestCase
   end
 end
 
-class YamlFile
-  def initialize(data, problem_id)
-    @data = data
-    @problem_id = problem_id
+class Problem
+  attr_reader :id
+  def initialize(id)
+    @id = id
   end
 
-  def write
-    create_dir
-
-    File.open("#{save_path}testcase.yml", "w+") do |f|
-      f.write(@data)
+  def write_code
+    File.open("#{save_path}main.cpp", "w+") do |f|
+      f.write(CPP_DEFAULT)
     end
   end
 
-  private
+  def write_yaml(data)
+    File.open("#{save_path}testcase.yml", "w+") do |f|
+      f.write(data)
+    end
+  end
+
   def create_dir
     FileUtils.mkdir_p(save_path) unless FileTest.exist?(save_path)
   end
 
   def save_path
-    "./#{@problem_id}/"
+    "./#{@id}/"
   end
 end
 
@@ -94,8 +107,13 @@ def main
   problem_id = params["i"]
   raise "specify problem_id. use -i" unless problem_id
 
+  problem = Problem.new(problem_id)
+  problem.create_dir
+  problem.write_code
+  puts "Created a bootstrap code."
+
   index = 1
-  testcase = TestCase.new(problem_id, index)
+  testcase = TestCase.new(problem.id, index)
   yaml = {"testcase" => []}
 
   begin
@@ -113,7 +131,7 @@ def main
   rescue RuntimeError
     puts "Available testcases are loaded."
   ensure
-    YamlFile.new(yaml.to_yaml, problem_id).write
+    problem.write_yaml(yaml.to_yaml)
     puts "Finished writing a file."
   end
 end
