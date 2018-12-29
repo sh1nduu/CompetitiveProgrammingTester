@@ -16,7 +16,7 @@ And write your code in main.cpp.
 After your writing, execute below command and then you'll see colored test result.
 
 ```
-$ ruby run.rb -l c++14 -s code/main.cpp -t testcase/main.yml
+$ ruby run.rb -l c++14 -s sample/main.cpp -t sample/testcase.yml
 ```
 
 <img src="https://raw.githubusercontent.com/sh1nduu/CompetitiveProgrammingTester/master/misc/command.png " height="150">
