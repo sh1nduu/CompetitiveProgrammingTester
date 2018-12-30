@@ -1,8 +1,10 @@
-module LanguageMap extend self
+module LanguageMap
+  module_function
+
   class Language
     def initialize(filename)
       @filename = filename
-      @basename = File.basename(filename, ".*")
+      @basename = File.basename(filename, '.*')
     end
   end
 
@@ -18,9 +20,8 @@ module LanguageMap extend self
 
   def get(lang, filename)
     case lang
-    when "c++14"
+    when 'c++14'
       Cpp14.new(filename)
     end
   end
 end
-

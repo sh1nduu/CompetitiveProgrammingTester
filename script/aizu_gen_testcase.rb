@@ -8,7 +8,7 @@ require 'uri'
 
 INTERVAL = 2 # crawling interval seconds
 
-CPP_DEFAULT = <<-EOF
+CPP_DEFAULT = <<-EOF.freeze
 #include <iostream>
 using namespace std;
 
@@ -24,12 +24,12 @@ class TestCase
   def initialize(problem_id, index)
     @problem_id = problem_id
     @index = index
-    @type = "in"
+    @type = 'in'
     @data = {}
   end
 
   def switch
-    @type = @type == "in" ? "out" : "in"
+    @type = @type == 'in' ? 'out' : 'in'
   end
 
   def increment
@@ -44,24 +44,26 @@ class TestCase
     response = Net::HTTP.get_response(uri)
     sleep(INTERVAL)
 
-    raise "HTTP Error #{response.code}" if response.code != "200"
-    raise "Not available" if unavailable?(@index, @problem_id, response.body)
+    raise "HTTP Error #{response.code}" if response.code != '200'
+    raise 'Not available' if unavailable?(@index, @problem_id, response.body)
+
     @body = response.body
     store_body
   end
 
   private
+
   def uri
     URI.parse(url_string)
   end
 
   def url_string
-    testcase_url = "https://judgedat.u-aizu.ac.jp/testcases/"
+    testcase_url = 'https://judgedat.u-aizu.ac.jp/testcases/'
     "#{testcase_url}#{@problem_id}/#{@index}/#{@type}"
   end
 
   def store_body
-    key = @type == "in" ? "input" : "expect"
+    key = @type == 'in' ? 'input' : 'expect'
     @data[key] = @body
   end
 
@@ -81,13 +83,13 @@ class Problem
   end
 
   def write_code
-    File.open("#{save_path}main.cpp", "w+") do |f|
+    File.open("#{save_path}main.cpp", 'w+') do |f|
       f.write(CPP_DEFAULT)
     end
   end
 
   def write_yaml(data)
-    File.open("#{save_path}testcase.yml", "w+") do |f|
+    File.open("#{save_path}testcase.yml", 'w+') do |f|
       f.write(data)
     end
   end
@@ -104,35 +106,35 @@ end
 def main
   params = ARGV.getopts('i:')
 
-  problem_id = params["i"]
-  raise "specify problem_id. use -i" unless problem_id
+  problem_id = params['i']
+  raise 'specify problem_id. use -i' unless problem_id
 
   problem = Problem.new(problem_id)
   problem.create_dir
   problem.write_code
-  puts "Created a bootstrap code."
+  puts 'Created a bootstrap code.'
 
   index = 1
   testcase = TestCase.new(problem.id, index)
-  yaml = {"testcase" => []}
+  yaml = { 'testcase' => [] }
 
   begin
-    while true do
+    loop do
       testcase.fetch
       puts "Loaded: #{testcase.description}"
       testcase.switch
 
       testcase.fetch
       puts "Loaded: #{testcase.description}"
-      yaml["testcase"] << testcase.data.dup
+      yaml['testcase'] << testcase.data.dup
       testcase.increment
       testcase.switch
     end
   rescue RuntimeError
-    puts "Available testcases are loaded."
+    puts 'Available testcases are loaded.'
   ensure
     problem.write_yaml(yaml.to_yaml)
-    puts "Finished writing a file."
+    puts 'Finished writing a file.'
   end
 end
 
