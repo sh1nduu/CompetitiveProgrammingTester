@@ -24,10 +24,8 @@ class TestCaseView
   end
 
   def draw_lines(text)
-    lines = text.split("\n")
-    lines.each.with_index(1) do |line, i|
-      w("#{text}", :alert, 2)
-      w("\n") unless i == lines.size
+    text.split("\n").each do |line|
+      w("#{line}\n", :alert, 2)
     end
   end
 end

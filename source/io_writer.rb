@@ -7,12 +7,12 @@ module IOWriter extend self
 
   def write(message, style=nil, nest=0)
     color_sq = get_color_sq(style)
-    print "#{INDENT*nest}#{color_sq}#{message}#{END_SQ}"
+    output_message = "#{INDENT*nest}#{color_sq}#{message}#{END_SQ}"
+    print output_message
   end
   alias w write
 
   private
-
   def get_color_sq(style)
     if style == :alert
       FG_RED_SQ
