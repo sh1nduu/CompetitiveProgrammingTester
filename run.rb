@@ -8,29 +8,30 @@ require_relative './source/result_view'
 require_relative './source/test_case'
 require_relative './source/test_case_view'
 
-module Main extend self
+module Main
+  module_function
+
   def run
     params = ARGV.getopts('l:s:t:')
+    raise 'testcase file is unspecified. use -t' unless params['t']
 
-    raise "testcase file is unspecified. use -t" unless params["t"]
-    yaml = load_yaml(params["t"])
-
-    language = LanguageMap::get(params["l"], params["s"])
-    raise "language is unsupported. verify -l" unless language
-
+    language = LanguageMap.get(params['l'], params['s'])
+    raise 'language is unsupported. verify -l' unless language
     return unless system(language.compile)
 
-    testcases = yaml["testcase"].map.with_index(1) do |testcase, i|
+    yaml = load_yaml(params['t'])
+    testcases = execute_testcases(yaml['testcase'], language)
+    ResultView.new(testcases).draw
+  end
+
+  def execute_testcases(testcases, language)
+    testcases.map.with_index(1) do |testcase, i|
       tc = TestCase.new(i, testcase, language)
       tc.execute
       TestCaseView.new(tc).draw
       tc
     end
-
-    ResultView.new(testcases).draw
   end
-
-  private
 
   def load_yaml(testcase_file)
     yaml = nil
@@ -38,7 +39,7 @@ module Main extend self
       yaml = f.read
     end
 
-    YAML.load(yaml)
+    YAML.safe_load(yaml)
   end
 end
 

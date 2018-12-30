@@ -16,6 +16,7 @@ class TestCaseView
   end
 
   private
+
   def draw_failure_detail
     w("Expected:\n", :alert, 1)
     draw_lines(@tc.expect)
