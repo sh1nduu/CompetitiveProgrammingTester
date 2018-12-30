@@ -8,7 +8,7 @@ require 'uri'
 
 INTERVAL = 2 # crawling interval seconds
 
-CPP_DEFAULT = <<-EOF.freeze
+CPP_DEFAULT = <<-CODE.freeze
 #include <iostream>
 using namespace std;
 
@@ -16,7 +16,7 @@ int main() {
   // Write your code here.
   return 0;
 }
-EOF
+CODE
 
 class TestCase
   attr_reader :data
@@ -103,39 +103,47 @@ class Problem
   end
 end
 
-def main
-  params = ARGV.getopts('i:')
+module Main
+  module_function
 
-  problem_id = params['i']
-  raise 'specify problem_id. use -i' unless problem_id
+  def run
+    params = ARGV.getopts('i:')
 
-  problem = Problem.new(problem_id)
-  problem.create_dir
-  problem.write_code
-  puts 'Created a bootstrap code.'
+    problem_id = params['i']
+    raise 'specify problem_id. use -i' unless problem_id
 
-  index = 1
-  testcase = TestCase.new(problem.id, index)
-  yaml = { 'testcase' => [] }
+    problem = Problem.new(problem_id)
+    problem.create_dir
+    problem.write_code
+    puts 'Created a bootstrap code.'
 
-  begin
-    loop do
-      testcase.fetch
-      puts "Loaded: #{testcase.description}"
-      testcase.switch
-
-      testcase.fetch
-      puts "Loaded: #{testcase.description}"
-      yaml['testcase'] << testcase.data.dup
-      testcase.increment
-      testcase.switch
+    testcase = TestCase.new(problem.id, 1)
+    yaml = { 'testcase' => [] }
+    begin
+      loop do
+        testdata = fetch_test_inout(testcase)
+        yaml['testcase'] << testdata
+      end
+    rescue RuntimeError
+      puts 'Available testcases are loaded.'
+    ensure
+      problem.write_yaml(yaml.to_yaml)
+      puts 'Finished writing a file.'
     end
-  rescue RuntimeError
-    puts 'Available testcases are loaded.'
-  ensure
-    problem.write_yaml(yaml.to_yaml)
-    puts 'Finished writing a file.'
+  end
+
+  def fetch_test_inout(testcase)
+    testcase.fetch
+    puts "Loaded: #{testcase.description}"
+    testcase.switch
+
+    testcase.fetch
+    puts "Loaded: #{testcase.description}"
+    testcase.increment
+    testcase.switch
+
+    testcase.data.dup
   end
 end
 
-main
+Main.run
