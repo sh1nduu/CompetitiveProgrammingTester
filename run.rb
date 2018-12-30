@@ -12,7 +12,7 @@ module Main
   module_function
 
   def run
-    params = ARGV.getopts('l:s:t:')
+    params = ARGV.getopts('l:s:t:n:')
     raise 'testcase file is unspecified. use -t' unless params['t']
 
     language = LanguageMap.get(params['l'], params['s'])
@@ -20,17 +20,26 @@ module Main
     return unless system(language.compile)
 
     yaml = load_yaml(params['t'])
-    testcases = execute_testcases(yaml['testcase'], language)
+    testcase = yaml['testcase']
+    n = params['n'].to_i
+    testcases = execute_testcases(testcase, language, n)
+
     ResultView.new(testcases).draw
   end
 
-  def execute_testcases(testcases, language)
+  def execute_testcases(testcases, language, number)
+    if !number.zero? && testcases.size < number
+      raise 'specified test case does not exist. verify -n'
+    end
+
     testcases.map.with_index(1) do |testcase, i|
+      next unless number.zero? || i == number
+
       tc = TestCase.new(i, testcase, language)
       tc.execute
       TestCaseView.new(tc).draw
       tc
-    end
+    end.compact
   end
 
   def load_yaml(testcase_file)
