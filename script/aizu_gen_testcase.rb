@@ -83,9 +83,13 @@ class Problem
   end
 
   def write_code
-    File.open("#{save_path}main.cpp", 'w+') do |f|
+    file_path = "#{save_path}main.cpp"
+    return false if File.exist?(file_path)
+
+    File.open(file_path, 'w+') do |f|
       f.write(CPP_DEFAULT)
     end
+    true
   end
 
   def write_yaml(data)
@@ -114,11 +118,12 @@ module Main
 
     problem = Problem.new(problem_id)
     problem.create_dir
-    problem.write_code
-    puts 'Created a bootstrap code.'
+    puts 'Created a bootstrap code.' if problem.write_code
 
     testcase = TestCase.new(problem.id, 1)
     yaml = { 'testcase' => [] }
+
+    puts 'Started fetching test cases.'
     begin
       loop do
         testdata = fetch_test_inout(testcase)
