@@ -8,12 +8,9 @@ class TestCase
   end
 
   def execute
-    IO.popen(@language.execute, 'r+') do |io|
-      io.puts @input
-      io.close_write
-      @output = io.readlines.join
-      @result = @output == @expect
-    end
+    require 'open3'
+    @output, = Open3.capture3(@language.execute, stdin_data: @input)
+    @result = @output == @expect
   end
 
   def success?
