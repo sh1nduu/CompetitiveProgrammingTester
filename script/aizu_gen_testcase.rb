@@ -10,7 +10,6 @@ INTERVAL = 2 # crawling interval seconds
 
 CPP_DEFAULT = <<-CODE.freeze
 #include <iostream>
-using namespace std;
 
 int main() {
   // Write your code here.
