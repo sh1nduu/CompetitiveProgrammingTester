@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'yaml'
-require 'optparse'
 require_relative './source/io_writer'
 require_relative './source/language_map'
 require_relative './source/result_view'
@@ -12,6 +10,7 @@ module Main
   module_function
 
   def run
+    require 'optparse'
     params = ARGV.getopts('l:s:t:n:')
     raise 'testcase file is unspecified. use -t' unless params['t']
 
@@ -48,6 +47,7 @@ module Main
       yaml = f.read
     end
 
+    require 'yaml'
     YAML.safe_load(yaml)
   end
 end
