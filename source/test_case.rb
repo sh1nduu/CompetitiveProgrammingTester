@@ -29,19 +29,16 @@ class TestCase
   private
 
   def result_with_precision
-    precision = @precision.to_i
-    raise 'specify valid precision. use -p' if precision.zero?
-
-    @expect.split("\n").zip(@output.split("\n")).detect do |e, o|
-      equal_with_precision(e, o, precision)
+    @expect.split("\n").zip(@output.split("\n")).detect do |expect, output|
+      out_of_tolerance?(expect, output)
     end.nil?
   end
 
-  def equal_with_precision(lhs, rhs, precision)
+  def out_of_tolerance?(lhs, rhs)
     require 'bigdecimal'
     require 'bigdecimal/util'
-    lhs = lhs.to_d.truncate(precision + 1)
-    rhs = rhs.to_d.truncate(precision + 1)
-    (lhs - rhs).abs > 0.1**precision
+    lhs = lhs.to_d.truncate(@precision + 1)
+    rhs = rhs.to_d.truncate(@precision + 1)
+    (lhs - rhs).abs > 0.1**@precision
   end
 end
