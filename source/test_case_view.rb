@@ -18,10 +18,17 @@ class TestCaseView
   private
 
   def draw_failure_detail
+    draw_precision
     w("Expected:\n", :alert, 1)
     draw_lines(@tc.expect)
     w("But got:\n", :alert, 1)
     draw_lines(@tc.output)
+  end
+
+  def draw_precision
+    return if @tc.precision.nil?
+
+    w("Judged with precision: #{@tc.precision}\n", nil, 1)
   end
 
   def draw_lines(text)
