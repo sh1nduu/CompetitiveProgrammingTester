@@ -14,24 +14,26 @@ module Main
     params = ARGV.getopts('l:s:t:n:p:')
     raise 'testcase file is unspecified. use -t' unless params['t']
 
-    language = LanguageMap.get(params['l'], params['s'])
-    raise 'language is unsupported. verify -l' unless language
+    language = get_language(params['l'], params['s'])
     return unless system(language.compile)
 
     yaml = load_yaml(params['t'])
     testcases = execute_testcases(yaml['testcase'],
                                   language,
-                                  params['n'].to_i,
-                                  params['p'])
+                                  params)
 
     ResultView.new(testcases).draw
   end
 
-  def execute_testcases(testcases, language, number, precision)
-    if !number.zero? && testcases.size < number
-      raise 'specified test case does not exist. verify -n'
-    end
+  def get_language(identifier, source)
+    language = LanguageMap.get(identifier, source)
+    raise 'language is unsupported. verify -l' unless language
 
+    language
+  end
+
+  def execute_testcases(testcases, language, params)
+    number, precision = validate_params(params, testcases)
     testcases.map.with_index(1) do |testcase, i|
       next unless number.zero? || i == number
 
@@ -40,6 +42,30 @@ module Main
       TestCaseView.new(tc).draw
       tc
     end.compact
+  end
+
+  def validate_params(params, testcases)
+    number = validate_number(params['n'], testcases)
+    precision = validate_precision(params['p'])
+    [number, precision]
+  end
+
+  def validate_number(number, testcases)
+    number = number.to_i
+    if !number.zero? && testcases.size < number
+      raise 'specified test case does not exist. verify -n'
+    end
+
+    number
+  end
+
+  def validate_precision(precision)
+    if precision
+      precision = precision.to_i
+      raise 'specify valid precision. use -p' if precision.zero?
+    end
+
+    precision
   end
 
   def load_yaml(testcase_file)
