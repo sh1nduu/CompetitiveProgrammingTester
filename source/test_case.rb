@@ -10,7 +10,11 @@ class TestCase
 
   def execute
     require 'open3'
-    @output, = Open3.capture3(@language.execute, stdin_data: @input)
+    thread = Thread.new do
+      @output, = Open3.capture3(@language.execute, stdin_data: @input)
+    end
+    thread.join(2)
+    @output ||= 'Time Limit Exceeded'
     @result = if @precision.nil?
                 @output == @expect
               else
